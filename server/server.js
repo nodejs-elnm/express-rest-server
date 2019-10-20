@@ -1,6 +1,10 @@
 require('./config/config');
 
 const express = require('express');
+const mongoose = require('mongoose');
+
+
+
 const app = express();
 
 const bodyParser = require('body-parser');
@@ -8,33 +12,19 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+app.use( require( './routes/users'));
 
-app.get('/user', (req, res) => {
-    res.json('get');
-});
 
-app.post('/user', (req, res) => {
-
-    let body = req.body;
-
-    if( req.body === undefined){
-
-    }else{
-        res.json({
-            body
-        });
-    }
-
-});
-
-app.put('/user/:id', (req, res) => {
+//Conexión a BaseDatos
+mongoose.connect('mongodb://localhost:27017/cafeDB', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}, (err) => {
+    if (err) throw err;
+    console.log('DDBB ONLINE');
     
-    let id = req.params.id;
-    
-    res.json({
-        id
-    });
 });
+
 
 
 app.listen(process.env.PORT);
