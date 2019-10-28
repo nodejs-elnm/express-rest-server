@@ -1,12 +1,42 @@
 // Requires
 const express = require('express');
 const bcrypt = require('bcrypt');
+const _ = require('underscore');
 const User = require('../models/user');
 
 const app = express();
 
 app.get('/user', (req, res) => {
-    res.json('get');
+    
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    let limit = req.query.limite || 5;
+    limit = Number(limit);
+
+
+    User.find( { estado: true }, "name email google estado" ) //para filtrar una salida, sin el "string datos", sólo se aplica la búsqueda total
+        .limit(limit)
+        .skip(desde)
+        .exec( (err, users ) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            User.count({ estado: true }, (err, numTotal) => {
+                res.json({
+                    ok:true,
+                    total_usuarios: numTotal,
+                    users
+                });
+            });
+
+        });
+    
+    
 });
 
 app.post('/user', (req, res) => {
@@ -27,6 +57,7 @@ app.post('/user', (req, res) => {
                 err
             });
         }
+        
 
         res.json({
             ok: true,
@@ -39,10 +70,59 @@ app.post('/user', (req, res) => {
 app.put('/user/:id', (req, res) => {
 
     let id = req.params.id;
+    let body = _.pick(req.body, ['name', 'email', 'img', 'role', 'estado'] );
 
-    res.json({
-        id
+    User.findByIdAndUpdate( id, body, { new: true, runValidators: true }, (err, userDB) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+
+        res.json({
+            ok: true,
+            user: userDB
+        });
     });
+
+
+});
+
+app.delete('/user/:id', (req, res) => {
+
+    let id = req.params.id;
+
+    //User.findByIdAndRemove(id, (err, user) => {
+
+    let estado = {
+        estado: false
+    };
+
+
+    User.findByIdAndUpdate(id, estado, {new: true}, (err, user) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+
+        if ( !user ){
+            return res.status(400).json({
+                ok:false,
+                err: {
+                    msg: 'Usuario no encontrado'
+                }
+            });
+        }
+
+        res.json({
+            ok: true,
+            user
+        });
+    });
+
 });
 
 
