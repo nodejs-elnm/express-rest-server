@@ -16,15 +16,15 @@ app.use( require( './routes/users'));
 
 
 //Conexión a BaseDatos
-mongoose.connect('mongodb://localhost:27017/cafeDB', {
+mongoose.connect(process.env.URLDB, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
+    useUnifiedTopology: true, 
     useCreateIndex: true
 }, (err) => {
     if (err) throw err;
     console.log('DDBB ONLINE');
-    
-});
+}).catch (error => console.log(error));
+
 
 
 
