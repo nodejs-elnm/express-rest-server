@@ -1,19 +1,15 @@
 // ==========
 //  PUERTO
-// ==========
-
 process.env.PORT = process.env.PORT || 3000;
 
 
 // ==========
 //  Entorno
-// ==========
 process.env.NODE_ENV = process.env.NODE_ENV || 'dev';
 
 
 // ==========
 //  DDBB
-// ==========
 let urlDB;
 
 if (process.env.NODE_ENV === 'dev') {
